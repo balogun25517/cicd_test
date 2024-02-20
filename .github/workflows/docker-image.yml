@@ -24,7 +24,9 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }} 
           
       - name: Build the Docker image
-        run: |
-          docker build . --file Dockerfile --tag cicdtest:$(date)
-          docker push grandeur.azurecr.io/cicdtest:$(date)
-          done
+        run: docker build . --file Dockerfile --tag cicdtest:$(date)
+      
+      - name: Push to Registry 
+        run: docker push grandeur.azurecr.io/cicdtest:$(date) 
+
+          
