@@ -28,7 +28,7 @@ jobs:
       - name: Build and Push Docker Images
         run: |
           for dir in $(find . -mindepth 3 -maxdepth 3 -type f -name 'Dockerfile'); do
-          image_name=$(dirname $dir | cut -d'/' -f3,4)
+          image_name=cicdtest
           docker build -t grandeur.azurecr.io/$image_name:${{ github.run_number }} $(dirname $dir)
           docker push grandeur.azurecr.io/$image_name:${{ github.run_number }}
           done
