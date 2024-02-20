@@ -1,0 +1,30 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the code from the repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      # Log in to Azure Container Registry
+      - name: Login to Azure Container Registry
+        uses: azure/docker-login@v1
+        with:
+          login-server: grandeur.azurecr.io   
+          username: ${{ secrets.ACR_USERNAME }} 
+          password: ${{ secrets.ACR_PASSWORD }} 
+          
+      - name: Build the Docker image
+        run: |
+          docker build . --file Dockerfile --tag cicdtest:$(date)
+          docker push grandeur.azurecr.io/cicdtest:$(date)
+          done
