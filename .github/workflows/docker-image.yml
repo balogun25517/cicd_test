@@ -23,10 +23,17 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }} 
           password: ${{ secrets.ACR_PASSWORD }} 
           
-      - name: Build the Docker image
-        run: docker build . --file Dockerfile --tag cicdtest:$(date)
-      
-      - name: Push to Registry 
-        run: docker push grandeur.azurecr.io/cicdtest:$(date) 
+      # - name: Build the Docker image
+      #   run: docker build -t grandeur.azurecr.io/cicdtest:$(date)
+      - name: Build and Push Docker Images
+      run: |
+        for dir in $(find . -mindepth 3 -maxdepth 3 -type f -name 'Dockerfile'); do
+          image_name=$(dirname $dir | cut -d'/' -f3,4)
+          docker build -t grandeur.azurecr.io/$image_name:${{ github.run_number }} $(dirname $dir)
+          docker push grandeur.azurecr.io/$image_name:${{ github.run_number }}
+        done
+      # Replace <ACR_NAME> with your ACR name
+      # - name: Push to Registry 
+      #   run: docker push grandeur.azurecr.io/cicdtest:$(date) 
 
           
