@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.ACR_PASSWORD }} 
           
       - name: Build Image
-        run: docker build - < Dockerfile -t grandeur.azurecr.io/cicd:1.0
+        run: docker build . -t grandeur.azurecr.io/cicd:1.0
       - name: Push Image
         run: docker push grandeur.azurecr.io/cicd:1.0
 
