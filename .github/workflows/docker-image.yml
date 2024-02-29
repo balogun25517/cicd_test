@@ -73,7 +73,7 @@ jobs:
        # Persist the incremented tag value for future runs
       - name: Increment env variable
         run: |
-          curl --location --request PATCH 'https://api.github.com/repos/Application-Management-Division/byefrost-az-terraform-ws-dev/actions/variables/APP_VERSION' \
+          curl --location --request PATCH 'https://api.github.com/repos/balogun25517/cicd_test/actions/variables/APP_VERSION' \
           --header 'Accept: application/vnd.github+json' \
           --header 'Authorization: Bearer ${{ secrets.GIT_TOKEN}}' \
           --header 'Content-Type: text/plain' \
