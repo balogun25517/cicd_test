@@ -62,8 +62,8 @@ jobs:
           fi
           docker_tag="${{ github.sha }}"
           # Build and push the Docker image
-          docker build -t ***.azurecr.io/$image_name:$docker_tag $(dirname $dir)
-          docker push ***.azurecr.io/$image_name:$docker_tag
+          docker build -t grandeur.azurecr.io/$image_name:$docker_tag $(dirname $dir)
+          docker push grandeur.azurecr.io/$image_name:$docker_tag
           done
           
 
