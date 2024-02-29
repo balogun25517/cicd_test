@@ -38,13 +38,9 @@ jobs:
           # Split major and minor versions
           major_version=$(echo "$last_tag" | cut -d. -f1)
           minor_version=$(echo "$last_tag" | cut -d. -f2)
-          
-          # Increment minor version by 1
           new_minor_version=$(echo "$minor_version + 1" | bc)
-          
-          # Calculate new tag
           new_tag="${major_version}.${new_minor_version}"
-          echo "::set-output name=new_tag::$new_tag"
+          echo "NEW_TAG=${new_tag}" >> $GITHUB_ENV
         env:
           LAST_TAG: ${{ env.LAST_TAG }}
 
