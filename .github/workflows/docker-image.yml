@@ -15,23 +15,25 @@ jobs:
       # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
-        
+
       # Log in to Azure Container Registry
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v1
         with:
-          login-server: xxx.azurecr.io   
-          username: ${{ secrets.ACR_USERNAME }} 
-          password: ${{ secrets.ACR_PASSWORD }} 
-          
+          login-server: grandeur.azurecr.io
+          username: ${{ secrets.ACR_USERNAME }}
+          password: ${{ secrets.ACR_PASSWORD }}
+
       # Increment the version
       - name: Get current version
         id: get_version
-        run: echo "VERSION=$(($(echo ${{ github.run_number }})-1)).${{ github.run_number }}"
-        shell: bash
-        
+        run: echo "VERSION=$(($(echo ${{ github.run_number }})-1)).${{ github.run_number }}" >> $GITHUB_ENV
+
+      - name: Show version
+        run: echo "Version is ${{ env.VERSION }}"
+
       - name: Build Image
-        run: docker build . -t grandeur.azurecr.io/cicd:${{ steps.get_version.outputs.VERSION }}
-        
+        run: docker build . -t grandeur.azurecr.io/cicd:${{ env.VERSION }}
+
       - name: Push Image
-        run: docker push grandeur.azurecr.io/cicd:${{ steps.get_version.outputs.VERSION }}
+        run: docker push grandeur.azurecr.io/cicd:${{ env.VERSION }}
