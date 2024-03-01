@@ -27,12 +27,13 @@ jobs:
       # Increment the version
       - name: Get current version
         id: get_version
-        run: echo "VERSION=1.$(( $(echo ${{ github.run_number }}) ))"
+        run: echo "VERSION=1.${{ github.run_number }}"
         shell: bash
 
       - name: Show version
         run: echo "Version is ${{ env.VERSION }}"
 
+      # Build Image
       - name: Build Image
         run: docker build . -t grandeur.azurecr.io/cicd:${{ env.VERSION }}
 
