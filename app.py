@@ -17,7 +17,7 @@ class MyHandler(BaseHTTPRequestHandler):
 
 
 Test Docker Image!
-Version 2
+Version 3
 ''')
         
 def run():
