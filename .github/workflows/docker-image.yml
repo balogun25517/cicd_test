@@ -3,8 +3,7 @@ name: Docker Image CI
 on:
   push:
     branches: [ "main" ]
-    tags:
-      - 'v*'
+
   pull_request:
     branches: [ "main" ]
 
@@ -21,13 +20,18 @@ jobs:
       - name: Login to Azure Container Registry
         uses: azure/docker-login@v1
         with:
-          login-server: grandeur.azurecr.io   
+          login-server: xxx.azurecr.io   
           username: ${{ secrets.ACR_USERNAME }} 
           password: ${{ secrets.ACR_PASSWORD }} 
           
-      - name: Build Image
-        run: docker build . -t grandeur.azurecr.io/cicd:${{ github.ref_name }}
-      - name: Push Image
-        run: docker push grandeur.azurecr.io/cicd:${{ github.ref_name }}
-
+      # Increment the version
+      - name: Get current version
+        id: get_version
+        run: echo "VERSION=$(($(echo ${{ github.run_number }})-1)).${{ github.run_number }}"
+        shell: bash
         
+      - name: Build Image
+        run: docker build . -t grandeur.azurecr.io/cicd:${{ steps.get_version.outputs.VERSION }}
+        
+      - name: Push Image
+        run: docker push grandeur.azurecr.io/cicd:${{ steps.get_version.outputs.VERSION }}
