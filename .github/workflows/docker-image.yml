@@ -27,8 +27,7 @@ jobs:
       # Increment the version
       - name: Get current version
         id: get_version
-        run: echo "VERSION=1.${{ github.run_number }}"
-        shell: bash
+        run: echo "VERSION=1.${{ github.run_number }}" >> $GITHUB_ENV
 
       - name: Show version
         run: echo "Version is ${{ env.VERSION }}"
