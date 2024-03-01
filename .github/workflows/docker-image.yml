@@ -1,12 +1,13 @@
-name: Build and Push Docker Images to Azure Container Registry
+name: Docker Image CI
+
 on:
   push:
-    branches:
-      - main 
-      
-env:
-  LAST_TAG: 1.0
-  
+    branches: [ "main" ]
+    tags:
+      - 'v*'
+  pull_request:
+    branches: [ "main" ]
+
 jobs:
 
   build-and-push:
@@ -15,12 +16,6 @@ jobs:
       # Checkout the code from the repository
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20' # Change this to '20' or the desired version
-
         
       # Log in to Azure Container Registry
       - name: Login to Azure Container Registry
@@ -30,61 +25,7 @@ jobs:
           username: ${{ secrets.ACR_USERNAME }} 
           password: ${{ secrets.ACR_PASSWORD }} 
           
-# Get the incremented tag
-      - name: Increment the tag
-        id: increment_tag
-        run: |
-          last_tag=${{ env.APP_VERSION }}
-          # Split major and minor versions
-          major_version=$(echo "$last_tag" | cut -d. -f1)
-          minor_version=$(echo "$last_tag" | cut -d. -f2)
-          new_minor_version=$(echo "$minor_version + 1" | bc)
-          new_tag="${major_version}.${new_minor_version}"
-          echo "NEW_TAG=${new_tag}" >> $GITHUB_ENV
-        env:
-          LAST_TAG: ${{ env.LAST_TAG }}
-
-
-      # Build and push Docker images in subdirectories
-
-      - name: Build and Push Docker Images
-        run: |
-          for dir in $(find . -mindepth 2 -maxdepth 2 -type f -name '*'); do
-          image_name=$(dirname $dir | cut -d'/' -f2)
-          # Validate the image name
-          if [[ "$image_name" == .* ]]; then
-              echo "Invalid image name: $image_name. Skipping..."
-              continue
-          fi
-          docker_tag="${{ github.sha }}"
-          
-          # Build and push the Docker image
-          docker build -t grandeur.azurecr.io/$image_name:$docker_tag $(dirname $dir)
-          docker push grandeur.azurecr.io/$image_name:$docker_tag
-          done
-          
-
-
-      # Persist the incremented tag value for future runs
-      - name: Persist the tag value
-        env:
-          NEW_TAG: ${{ steps.increment_tag.outputs.new_tag }}
-        run: echo "LAST_TAG=${{ env.NEW_TAG }}" >> $GITHUB_ENV
-        
-       # Persist the incremented tag value for future runs
-      - name: Increment env variable
-        run: |
-          curl --location --request PATCH 'https://api.github.com/repos/balogun25517/cicd_test/actions/variables/APP_VERSION' \
-          --header 'Accept: application/vnd.github+json' \
-          --header 'Authorization: Bearer ${{ secrets.GIT_TOKEN}}' \
-          --header 'Content-Type: text/plain' \
-          --header 'X-GitHub-Api-Version: 2022-11-28' \
-          --data '{"name":"APP_VERSION","value": ${{ env.NEW_TAG }}}'
-
-
-
-         # for dir in $(find . -mindepth 2 -maxdepth 2 -type f -name '*'); do
-          #   image_name=$(dirname $dir | cut -d'/' -f2)
-          #   docker build -t grandeur.azurecr.io/$image_name:${{ github.sha }} $(dirname $dir)
-          #   docker push grandeur.azurecr.io/$image_name:${{ github.sha }}
-          # done 
+      - name: Build Image
+        run: docker build . -t grandeur.azurecr.io/{{ github.ref_name }}
+      - name: Push Image
+        run: docker push grandeur.azurecr.io/{{ github.ref_name }}
